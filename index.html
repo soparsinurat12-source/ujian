@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soal Bahasa Indonesia Profesional</title>
+<style>
+:root{--bg:#f0ebf8;--card:#fff;--text:#202124;--muted:#5f6368;--line:#dadce0;--main:#673ab7;--ok-bg:#e6f4ea;--ok:#137333;--no-bg:#fce8e6;--no:#c5221f}
+@media(prefers-color-scheme:dark){:root{--bg:#1c1b22;--card:#2a2931;--text:#eceaf2;--muted:#a7a4b3;--line:#44424f;--main:#a68be0;--ok-bg:#16301f;--ok:#7fd69a;--no-bg:#3a1c1b;--no:#f4a29f}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5}
+.wrap{max-width:720px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px;margin-bottom:14px}
+.head{border-top:8px solid var(--main)}
+h1{font-size:24px;font-weight:500;margin:0 0 8px}
+.desc{color:var(--muted);font-size:14px;margin:0}
+.req{color:var(--no);font-size:13px;margin:12px 0 0}
+.q{font-size:16px;margin:0 0 4px}
+.pt{font-size:12px;color:var(--muted);margin:0 0 12px}
+.opt{display:block;width:100%;text-align:left;background:transparent;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:8px;font:inherit;font-size:15px;cursor:pointer;display:flex;gap:12px;align-items:flex-start}
+.opt:hover{border-color:var(--main)}
+.opt .dot{flex:0 0 18px;height:18px;border:2px solid var(--muted);border-radius:50%;margin-top:2px;position:relative}
+.opt.sel{border-color:var(--main);background:rgba(103,58,183,.1)}
+.opt.sel .dot{border-color:var(--main)}
+.opt.sel .dot::after{content:"";position:absolute;inset:3px;background:var(--main);border-radius:50%}
+.opt.benar{border-color:var(--ok);background:var(--ok-bg)}
+.opt.salah{border-color:var(--no);background:var(--no-bg)}
+.opt:disabled{cursor:default}
+.fb{margin-top:6px;padding:10px 12px;border-radius:8px;font-size:14px}
+.fb.ok{background:var(--ok-bg);color:var(--ok)}
+.fb.no{background:var(--no-bg);color:var(--no)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.btn{background:var(--main);color:#fff;border:0;border-radius:8px;padding:12px 28px;font:inherit;font-size:15px;font-weight:500;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--main);border:1px solid var(--main)}
+.skor{font-size:18px;font-weight:500}
+.err{color:var(--no);font-size:14px;margin:10px 0 0;min-height:20px}
+.prog{font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card head">
+<h1>Soal Bahasa Indonesia Profesional</h1>
+<p class="desc">Pilihlah satu jawaban yang paling tepat. Setiap soal bernilai 10 poin dengan total 100 poin.</p>
+<p class="req">* Wajib diisi</p>
+</div>
+<div id="soal"></div>
+<div class="card">
+<div class="bar">
+<div>
+<span class="prog" id="prog">Terjawab 0 dari 10</span>
+<div class="skor" id="skor"></div>
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button class="btn ghost" id="ulang" style="display:none">Ulangi</button>
+<button class="btn" id="kirim">Kirim</button>
+</div>
+</div>
+<p class="err" id="err"></p>
+</div>
+</div>
+<script>
+const S=[
+{t:'Kelompok kata yang seluruhnya ditulis baku adalah ...',p:['apotik, aktifitas, analisa, resiko','apotek, aktivitas, analisis, risiko','apotek, aktifitas, analisis, resiko','apotik, aktivitas, analisa, risiko'],b:1,e:'Bentuk baku: apotek, aktivitas, analisis, dan risiko.'},
+{t:'Kalimat yang efektif adalah ...',p:['Para peserta-peserta rapat diharapkan hadir tepat waktu.','Peserta rapat diharapkan hadir tepat waktu.','Diharapkan agar para peserta-peserta rapat untuk hadir tepat waktu.','Adalah peserta rapat diharapkan supaya hadir dengan tepat pada waktunya.'],b:1,e:'Kalimat efektif hemat kata dan tidak mengandung pemborosan seperti bentuk jamak ganda.'},
+{t:'Penulisan kata depan di- yang benar terdapat pada kalimat ...',p:['Laporan itu di kirim ke kantor pusat kemarin.','Ia tinggal dikota Bandung sejak tahun 2015.','Dokumen tersebut disimpan di dalam lemari arsip.','Rapat akan di adakan di aula kantor.'],b:2,e:'Di- sebagai awalan ditulis serangkai dengan kata kerja, sedangkan di sebagai kata depan ditulis terpisah dari kata tempat.'},
+{t:'Penggunaan huruf kapital yang tepat terdapat pada kalimat ...',p:['Ia lulus dari universitas Gadjah Mada pada bulan agustus.','Rapat dipimpin oleh Direktur Utama PT Nusantara Jaya, Bapak Ahmad Fauzi.','Dia berlibur ke Pulau bali pada hari senin.','Adik saya bersekolah di sekolah Menengah Atas Negeri 1.'],b:1,e:'Huruf kapital dipakai pada jabatan yang diikuti nama orang atau instansi, nama diri, nama bulan, dan nama hari.'},
+{t:'Penggunaan tanda koma yang tepat terdapat pada kalimat ...',p:['Saya membeli buku, pensil dan penghapus.','Saya membeli buku, pensil, dan penghapus.','Saya, membeli buku pensil, dan penghapus.','Saya membeli, buku, pensil dan, penghapus.'],b:1,e:'Tanda koma dipakai di antara unsur dalam perincian dan sebelum kata dan pada unsur terakhir.'},
+{t:'Singkatan Yth. pada surat resmi memiliki kepanjangan ...',p:['Yang tertulis','Yang terhormat','Yang terlampir','Yang terkait'],b:1,e:'Yth. adalah singkatan dari Yang terhormat.'},
+{t:'Bentuk serapan yang tepat dari kata asing quality adalah ...',p:['kwalitas','kualitas','kuwalitas','kwalitet'],b:1,e:'Bentuk baku serapan dari quality adalah kualitas.'},
+{t:'Proyek itu tetap berjalan ... anggarannya sangat terbatas. Kata hubung yang tepat untuk melengkapi kalimat tersebut adalah ...',p:['sebab','meskipun','sehingga','karena itu'],b:1,e:'Meskipun menyatakan hubungan pertentangan atau konsesi antara dua klausa.'},
+{t:'Bentuk berimbuhan yang tepat dari kata dasar pengaruh dengan awalan me- adalah ...',p:['mempengaruhi','memengaruhi','memperngaruhi','mengpengaruhi'],b:1,e:'Huruf awal p luluh apabila mendapat awalan me-, sehingga menjadi memengaruhi.'},
+{t:'Penulisan waktu dan alamat yang sesuai kaidah ejaan terdapat pada kalimat ...',p:['Rapat dimulai pukul 09.00 WIB di Jl. Merdeka No. 10.','Rapat dimulai pukul 09:00 wib di jln Merdeka no 10.','Rapat dimulai jam 9.00 Wib di Jl Merdeka No10.','Rapat dimulai pukul 9,00 WIB di jl. merdeka no. 10.'],b:0,e:'Pukul ditulis dengan titik pemisah jam dan menit, WIB ditulis kapital, serta Jl. dan No. ditulis sesuai kaidah.'}
+];
+const wrap=document.getElementById('soal');
+const errEl=document.getElementById('err');
+const progEl=document.getElementById('prog');
+const skorEl=document.getElementById('skor');
+const kirimBtn=document.getElementById('kirim');
+const ulangBtn=document.getElementById('ulang');
+let pilih={};
+let selesai=false;
+
+function render(){
+  wrap.innerHTML='';
+  S.forEach(function(s,i){
+    const c=document.createElement('div');
+    c.className='card';
+    c.id='k'+i;
+    c.innerHTML='<p class="q">'+(i+1)+'. '+s.t+' <span style="color:var(--no)">*</span></p><p class="pt">10 poin</p>';
+    s.p.forEach(function(o,j){
+      const b=document.createElement('button');
+      b.type='button';
+      b.className='opt';
+      b.dataset.q=i;
+      b.dataset.o=j;
+      b.innerHTML='<span class="dot"></span><span>'+o+'</span>';
+      c.appendChild(b);
+    });
+    wrap.appendChild(c);
+  });
+}
+
+function updateProg(){
+  progEl.textContent='Terjawab '+Object.keys(pilih).length+' dari '+S.length;
+}
+
+wrap.addEventListener('click',function(e){
+  const b=e.target.closest('.opt');
+  if(!b||selesai)return;
+  const q=+b.dataset.q;
+  const o=+b.dataset.o;
+  pilih[q]=o;
+  document.querySelectorAll('#k'+q+' .opt').forEach(function(x){
+    x.classList.toggle('sel',+x.dataset.o===o);
+  });
+  errEl.textContent='';
+  updateProg();
+});
+
+kirimBtn.addEventListener('click',function(){
+  if(selesai)return;
+  const kosong=S.length-Object.keys(pilih).length;
+  if(kosong>0){
+    errEl.textContent='Masih ada '+kosong+' soal yang belum dijawab.';
+    for(let i=0;i<S.length;i++){
+      if(pilih[i]===undefined){
+        document.getElementById('k'+i).scrollIntoView({behavior:'smooth',block:'center'});
+        break;
+      }
+    }
+    return;
+  }
+  selesai=true;
+  let benar=0;
+  S.forEach(function(s,i){
+    const ok=pilih[i]===s.b;
+    if(ok)benar++;
+    const kartu=document.getElementById('k'+i);
+    kartu.querySelectorAll('.opt').forEach(function(x){
+      const j=+x.dataset.o;
+      x.disabled=true;
+      x.classList.remove('sel');
+      if(j===s.b)x.classList.add('benar');
+      else if(j===pilih[i])x.classList.add('salah');
+    });
+    const fb=document.createElement('div');
+    fb.className='fb '+(ok?'ok':'no');
+    fb.textContent=(ok?'Benar. ':'Kurang tepat. ')+s.e;
+    kartu.appendChild(fb);
+  });
+  skorEl.textContent='Skor: '+(benar*10)+' / 100';
+  kirimBtn.style.display='none';
+  ulangBtn.style.display='inline-block';
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+
+ulangBtn.addEventListener('click',function(){
+  pilih={};
+  selesai=false;
+  skorEl.textContent='';
+  errEl.textContent='';
+  kirimBtn.style.display='inline-block';
+  ulangBtn.style.display='none';
+  render();
+  updateProg();
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+
+render();
+updateProg();
+</script>
+</body>
+</html>
